@@ -1,13 +1,16 @@
+
 services:
   api:
     build: ./api
+    networks:
+      - app-network
     ports:
       - "3000:3000"
     environment:
-      DB_HOST: db
-      DB_USER: admin
-      DB_PASS: 123456
-      DB_NAME: desafio_extra
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
     volumes:
       - ./api:/app
       - /app/node_modules
@@ -17,20 +20,24 @@ services:
 
   db:
     image: postgres:16-alpine
+    networks:
+      - app-network
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: 123456
-      POSTGRES_DB: desafio_extra
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d desafio_extra"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
 
   adminer:
     image: adminer
+    networks:
+      - app-network
     ports:
       - "8080:8080"
     depends_on:
@@ -39,3 +46,8 @@ services:
 
 volumes:
   postgres_data:
+
+networks:
+  app-network:
+    name: exercicio-extra-network
+    driver: bridge
