@@ -1,0 +1,41 @@
+services:
+  api:
+    build: ./api
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: db
+      DB_USER: admin
+      DB_PASS: 123456
+      DB_NAME: desafio_extra
+    volumes:
+      - ./api:/app
+      - /app/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: desafio_extra
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d desafio_extra"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  adminer:
+    image: adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
