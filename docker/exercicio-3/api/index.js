@@ -15,7 +15,7 @@ const db = new Pool({
 });
 
 app.get('/', (req, res) => {
-    res.send('Teste do ambiente PROD!');
+    res.send(`Teste do ambiente ${process.env.APP_ENV}!`);
 });
 
 app.post('/mensagens', async (req, res) => {
